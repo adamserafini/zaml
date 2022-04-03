@@ -1,5 +1,5 @@
 # 🚀 zaml
-Fast YAML 1.2 parsing library for Python 3.10.x.
+Fast YAML 1.2 parsing library for Python 3.10.x. 🐍
 
 ## What's This?
 
