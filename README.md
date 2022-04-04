@@ -23,13 +23,13 @@ pre-commit install
 pre-commit run --all-files
 ```
 
-The simplest possible extension module is a module with one function, that takes no arguments and returns an 
-empty list. So let's get that working first in C, cross platform, and distributable and then translate it to Zig!
+The simplest possible extension module is a module with one function, that takes no arguments and returns an integer. 
+So let's get that working first in C, cross platform, and distributable and then translate it to Zig!
 
 ```bash
 python -m venv .venv
 source .venv/bin/activate
-python setup.py install
+python setup.py develop
 ```
 
 ### Tests
