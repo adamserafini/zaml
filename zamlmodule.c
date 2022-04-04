@@ -2,13 +2,13 @@
 #include <Python.h>
 
 static PyObject *
-zaml_load(PyObject *self, PyObject *args)
+zaml_load()
 {
     return Py_BuildValue("i", 1);
 }
 
 static PyMethodDef ZamlMethods[] = {
-    {"load", zaml_load, METH_VARARGS, "Load some tasty YAML."},
+    {"load", zaml_load, METH_NOARGS, "Load some tasty YAML."},
     {NULL, NULL, 0, NULL}        /* Sentinel */
 };
 
