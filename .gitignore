@@ -4,3 +4,4 @@ build/
 dist/
 zaml.egg-info
 *.so
+zig-cache/
