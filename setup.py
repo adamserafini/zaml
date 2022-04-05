@@ -10,7 +10,7 @@ class ZigBuilder(build_ext):
         assert len(ext.sources) == 1
 
         if not os.path.exists(self.build_lib):
-            os.mkdir(self.build_lib)
+            os.makedirs(self.build_lib)
         self.spawn(
             [
                 "zig",
