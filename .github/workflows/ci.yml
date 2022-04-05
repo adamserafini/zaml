@@ -6,7 +6,9 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macOS-latest, windows-latest]
+        # TODO: support other operating systems
+        # os: [ubuntu-latest, macOS-latest, windows-latest]
+        os: [macOS-latest]
 
     steps:
       - uses: actions/checkout@v3
