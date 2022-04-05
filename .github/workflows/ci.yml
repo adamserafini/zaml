@@ -6,8 +6,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        # TODO: get it working on Linux
-        os: [macOS-latest, windows-latest]
+        # TODO: get it working on other operating systems:
+        os: [macOS-latest]
 
     steps:
       - uses: actions/checkout@v3
