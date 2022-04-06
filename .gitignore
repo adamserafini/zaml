@@ -6,3 +6,4 @@ dist/
 *.so
 zig-cache/
 __pycache__
+.eggs

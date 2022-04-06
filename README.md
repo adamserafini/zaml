@@ -35,12 +35,27 @@ python setup.py develop
 
 ### Tests
 
-Tests that the extension can in-fact be installed and returns the expected result:
+Tests that the most basic possible Zig extension can in-fact be installed and returns the expected result:
 
-```
+```bash
 python test.py
 ```
 
 ### Benchmark
 
+To run a benchmark of the current ZAML prototype (also runs in CI and asserts that the YAML structure is correctly 
+parsed):
+```bash
+cd benchmark
+python benchmark.py
+```
 
+Results on my 2,3 GHz Quad-Core Intel Core i7:
+
+```bash
+Running benchmarks...
+
+Benchmark results:
+PyYAML took 13.25 seconds
+ZAML took 0.96 seconds
+```

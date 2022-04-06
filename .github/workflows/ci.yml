@@ -23,6 +23,6 @@ jobs:
           version: 0.9.1
       - name: Run simple module test
         run: python test.py
-      - name: Run benchmark test
+      - name: Run benchmark
         working-directory: ./benchmark
-        run: python test.py
+        run: python benchmark.py
