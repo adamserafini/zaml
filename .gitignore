@@ -2,6 +2,7 @@
 build/
 .idea/
 dist/
-zaml.egg-info
+*.egg-info
 *.so
 zig-cache/
+__pycache__
