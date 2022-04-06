@@ -50,7 +50,7 @@ cd benchmark
 python benchmark.py
 ```
 
-Results on my 2,3 GHz Quad-Core Intel Core i7:
+Results on my 2,3 GHz Quad-Core Intel Core i7 Mac:
 
 ```bash
 Running benchmarks...
@@ -59,3 +59,7 @@ Benchmark results:
 PyYAML took 13.25 seconds
 zaml took 0.96 seconds
 ```
+
+### Credits
+
+Would not exist without [kubkon's](https://github.com/kubkon), `zig-yaml`: https://github.com/kubkon/zig-yaml
