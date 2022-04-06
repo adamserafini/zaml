@@ -25,4 +25,4 @@ jobs:
         run: python test.py
       - name: Run benchmark test
         working-directory: ./benchmark
-        run: python test.pt
+        run: python test.py
