@@ -23,9 +23,9 @@ start = time.time()
 pyyaml_result = pyyaml.load(big_yaml, Loader=pyyaml.CSafeLoader)
 print(f"Benchmark results:\nPyYAML took {(time.time() - start):.2f} seconds")
 
-# Parsing with ZAML: Prototype YAML parser written in Zig:
+# Parsing with zaml: Prototype YAML parser written in Zig:
 start = time.time()
 zaml_result = zaml.load(big_yaml)
-print(f"ZAML took {(time.time() - start):.2f} seconds")
+print(f"zaml took {(time.time() - start):.2f} seconds")
 
 assert pyyaml_result == zaml_result

@@ -43,7 +43,7 @@ python test.py
 
 ### Benchmark
 
-To run a benchmark of the current ZAML prototype (also runs in CI and asserts that the YAML structure is correctly 
+To run a benchmark of the current `zaml` prototype (also runs in CI and asserts that the YAML structure is correctly 
 parsed):
 ```bash
 cd benchmark
@@ -57,5 +57,5 @@ Running benchmarks...
 
 Benchmark results:
 PyYAML took 13.25 seconds
-ZAML took 0.96 seconds
+zaml took 0.96 seconds
 ```
