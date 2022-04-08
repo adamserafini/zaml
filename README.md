@@ -30,7 +30,7 @@ This repo demonstrates a pure Zig module that does exactly that:
 ```bash
 python -m venv .venv
 source .venv/bin/activate
-python setup.py develop
+pip install -e .
 ```
 
 ### Tests
