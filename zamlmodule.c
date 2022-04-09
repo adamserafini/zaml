@@ -10,7 +10,7 @@ zaml_load(PyObject *self, PyObject *args)
 static PyMethodDef ZamlMethods[] = {
     {.ml_name = "load",
      .ml_meth = zaml_load,
-     .ml_flags = METH_VARARGS,
+     .ml_flags = METH_NOARGS,
      .ml_doc = "Load some tasty YAML."},
 
     {.ml_name = NULL,
