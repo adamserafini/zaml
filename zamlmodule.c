@@ -8,18 +8,28 @@ zaml_load(PyObject *self, PyObject *args)
 }
 
 static PyMethodDef ZamlMethods[] = {
-    {"load", zaml_load, METH_VARARGS,
-     "Load some tasty YAML."},
-    {NULL, NULL, 0, NULL}        /* Sentinel */
+    {.ml_name = "load",
+     .ml_meth = zaml_load,
+     .ml_flags = METH_VARARGS,
+     .ml_doc = "Load some tasty YAML."},
+
+    {.ml_name = NULL,
+     .ml_meth = NULL,
+     .ml_flags = 0,
+     .ml_doc = NULL}        /* Sentinel */
 };
 
 static struct PyModuleDef zamlmodule = {
-    PyModuleDef_HEAD_INIT,
-    "spam",   /* name of module */
-    NULL,     /* module documentation, may be NULL */
-    -1,       /* size of per-interpreter state of the module,
-                 or -1 if the module keeps state in global variables. */
-    ZamlMethods
+    .m_base = PyModuleDef_HEAD_INIT,
+    .m_name = "spam",  /* name of module */
+    .m_doc = NULL,     /* module documentation, may be NULL */
+    .m_size = -1,      /* size of per-interpreter state of the module,
+                         or -1 if the module keeps state in global variables. */
+    .m_methods = ZamlMethods,
+    .m_slots = NULL,
+    .m_traverse = NULL,
+    .m_clear = NULL,
+    .m_free = NULL,
 };
 
 PyMODINIT_FUNC
