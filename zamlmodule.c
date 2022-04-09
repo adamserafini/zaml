@@ -21,7 +21,7 @@ static PyMethodDef ZamlMethods[] = {
 
 static struct PyModuleDef zamlmodule = {
     .m_base = PyModuleDef_HEAD_INIT,
-    .m_name = "spam",  /* name of module */
+    .m_name = "zaml",  /* name of module */
     .m_doc = NULL,     /* module documentation, may be NULL */
     .m_size = -1,      /* size of per-interpreter state of the module,
                          or -1 if the module keeps state in global variables. */
