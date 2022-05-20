@@ -10,5 +10,5 @@ setup(
     ext_modules=[benchmark],
     cmdclass={"build_ext": ZigBuilder},
     setup_requires=["cython"],  # Required by pyyaml
-    install_requires=["pyyaml"],
+    install_requires=["pyyaml", "ruamel.yaml"],
 )
