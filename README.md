@@ -56,8 +56,10 @@ Results on my 2,3 GHz Quad-Core Intel Core i7 Mac:
 Running benchmarks...
 
 Benchmark results:
-PyYAML took 13.25 seconds
-zaml took 0.96 seconds
+zaml took 0.89 seconds
+PyYAML CSafeLoader took 13.36 seconds
+ruamel took 38.86 seconds
+PyYAML SafeLoader took 81.78 seconds
 ```
 
 ### Credits
