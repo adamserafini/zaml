@@ -65,3 +65,33 @@ PyYAML SafeLoader took 81.78 seconds
 ### Credits
 
 Would not exist without [kubkon's](https://github.com/kubkon), `zig-yaml`: https://github.com/kubkon/zig-yaml
+
+### Cross-platform Local Testing
+
+#### Linux
+
+To test in Linux, the easiest way is probably to use Docker:
+
+```bash
+docker run --name zaml -v $PWD:/root/zaml -it fedora
+```
+
+This kicks you into a shell in a running a container with this library mounted in
+the `/root/zaml` directory. Changes you make on your host machine will be immediately
+reflected in the container.
+
+Install zig and test the library:
+
+```bash
+dnf install zig
+cd /root/zaml
+python3 -m venv .venvlinux
+source .venvlinux/bin/activate
+pip install -e .
+```
+
+To re-attach to the container after exiting:
+
+```bash
+docker start -ia zaml
+```
