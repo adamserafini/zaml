@@ -6,8 +6,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        # TODO: get it working on other operating systems:
-        os: [macOS-latest]
+        # TODO: get it working on Windows
+        os: [macOS-latest, ubuntu-latest]
 
     steps:
       - uses: actions/checkout@v3
@@ -23,6 +23,10 @@ jobs:
           version: 0.9.1
       - name: Run simple module test
         run: python test.py
+
+  benchmark:
+    runs-on: ubuntu-latest
+    steps:
       - name: Run benchmark
         working-directory: ./benchmark
         run: python benchmark.py
