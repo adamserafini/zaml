@@ -25,4 +25,5 @@ jobs:
         run: python test.py
       - name: Run benchmark
         working-directory: ./benchmark
-        run: [ ${{ matrix.os }} = ubuntu-latest ] && python benchmark.py
+        run: >
+          [ ${{ matrix.os }} = ubuntu-latest ] && python benchmark.py
