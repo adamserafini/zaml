@@ -9,8 +9,8 @@ Proof-of-concept for my PyCon DE 2022 [talk](https://2022.pycon.de/program/DFWSQ
 Library with the following objectives:
  - [x] Written in pure Zig, importing `Python.h` headers directly, no FFI, `ctypes` or `cffi`.
  - [x] Compiled using the Zig toolchain / CLI, no other tool (eg. `clang`) required.
- - [x] Tested to be compatible with mac OSX.
- - [ ] Tested to be compatible with Linux and Windows.
+ - [x] Tested to be compatible with mac OSX and Linux.
+ - [ ] Tested to be compatible with Windows.
  - [ ] Installable via PyPI, end-user should not require Zig toolchain locally in order to use.
  - [ ] Fastest available YAML 1.2 parser for Python.
 
@@ -65,3 +65,33 @@ PyYAML SafeLoader took 81.78 seconds
 ### Credits
 
 Would not exist without [kubkon's](https://github.com/kubkon), `zig-yaml`: https://github.com/kubkon/zig-yaml
+
+### Cross-platform Local Testing
+
+#### Linux
+
+To test in Linux, the easiest way is probably to use Docker:
+
+```bash
+docker run --name zaml -v $PWD:/root/zaml -it fedora
+```
+
+This kicks you into a shell in a running a container with this library mounted in
+the `/root/zaml` directory. Changes you make on your host machine will be immediately
+reflected in the container.
+
+Install Python 3 headers, zig and test the library:
+
+```bash
+dnf install zig python3-devel
+cd /root/zaml
+python3 -m venv .venvlinux
+source .venvlinux/bin/activate
+pip install -e .
+```
+
+To re-attach to the container after exiting:
+
+```bash
+docker start -ia zaml
+```

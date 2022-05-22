@@ -2,25 +2,35 @@ name: CI
 on: pull_request
 
 jobs:
-  test:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        # TODO: get it working on other operating systems:
-        os: [macOS-latest]
-
+  # TODO: Get it working on Windows
+  test-mac-osx:
+    runs-on: macOS-latest
     steps:
       - uses: actions/checkout@v3
       - name: Setup up Python
         uses: actions/setup-python@v3
         with:
           python-version: '3.10'
-      - name: Lint Python files # TODO: get Zig linting working
-        uses: pre-commit/action@v2.0.3
       - name: Install Zig
         uses: goto-bus-stop/setup-zig@v1
         with:
           version: 0.9.1
+      - name: Run simple module test
+        run: python test.py
+  test-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.10'
+      - name: Install Zig
+        uses: goto-bus-stop/setup-zig@v1
+        with:
+          version: 0.9.1
+      - name: Lint Python files # TODO: get Zig linting working
+        uses: pre-commit/action@v2.0.3
       - name: Run simple module test
         run: python test.py
       - name: Run benchmark
