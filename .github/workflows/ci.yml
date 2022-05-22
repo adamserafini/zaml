@@ -23,10 +23,6 @@ jobs:
           version: 0.9.1
       - name: Run simple module test
         run: python test.py
-
-  benchmark:
-    runs-on: ubuntu-latest
-    steps:
       - name: Run benchmark
         working-directory: ./benchmark
-        run: python benchmark.py
+        run: [ ${{ matrix.os }} = ubuntu-latest ] && python benchmark.py

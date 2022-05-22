@@ -1,0 +1,20 @@
+name: 'Setup'
+description: 'Build environment for zaml'
+inputs:
+  os:
+    description: 'OS to build'
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/checkout@v3
+    - name: Setup up Python
+      uses: actions/setup-python@v3
+      with:
+        python-version: '3.10'
+    - name: Lint Python files # TODO: get Zig linting working
+      uses: pre-commit/action@v2.0.3
+    - name: Install Zig
+      uses: goto-bus-stop/setup-zig@v1
+      with:
+        version: 0.9.1
