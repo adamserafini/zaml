@@ -26,4 +26,7 @@ jobs:
       - name: Run benchmark
         working-directory: ./benchmark
         run: >
-          [ ${{ matrix.os }} = ubuntu-latest ] && python benchmark.py
+          if [ ${{ matrix.os }} = ubuntu-latest ];
+          then python benchmark.py
+          else
+          exit 0
