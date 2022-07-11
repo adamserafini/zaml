@@ -9,8 +9,7 @@ Proof-of-concept for my PyCon DE 2022 [talk](https://2022.pycon.de/program/DFWSQ
 Library with the following objectives:
  - [x] Written in pure Zig, importing `Python.h` headers directly, no FFI, `ctypes` or `cffi`.
  - [x] Compiled using the Zig toolchain / CLI, no other tool (eg. `clang`) required.
- - [x] Tested to be compatible with mac OSX and Linux.
- - [ ] Tested to be compatible with Windows.
+ - [x] Tested to be compatible with mac OSX, Linux and Windows.
  - [ ] Installable via PyPI, end-user should not require Zig toolchain locally in order to use.
  - [ ] Fastest available YAML 1.2 parser for Python.
 

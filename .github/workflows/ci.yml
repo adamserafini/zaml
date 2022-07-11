@@ -2,7 +2,20 @@ name: CI
 on: pull_request
 
 jobs:
-  # TODO: Get it working on Windows
+  test-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.10'
+      - name: Install Zig
+        uses: goto-bus-stop/setup-zig@v1
+        with:
+          version: 0.9.1
+      - name: Run simple module test
+        run: python test.py
   test-mac-osx:
     runs-on: macOS-latest
     steps:
