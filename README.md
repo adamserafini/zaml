@@ -94,3 +94,12 @@ To re-attach to the container after exiting:
 ```bash
 docker start -ia zaml
 ```
+
+#### Windows
+
+To test in Windows, the easiest way I have found is using [VirtualBox](https://www.virtualbox.org/wiki/Downloads).
+
+#### MacOSX
+
+I am writing this `README` on a Mac. Consequently, I have not attempted testing this library in MacOSX from another
+operating system host. If you manage this, please do add documentation about it here.
