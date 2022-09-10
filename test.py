@@ -1,6 +1,6 @@
 import subprocess
 
-failed = subprocess.call(["pip", "install", "-e", "."])
+failed = subprocess.call(["pip", "install", "-e", ".", "--verbose"])
 assert not failed
 
 import zaml
