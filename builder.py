@@ -9,7 +9,7 @@ def zig_spawn(original_spawn, cmd):
     cmd_str = " ".join(cmd)
     log.warn("original spawned command: %s", cmd_str)
 
-    if cmd[0].endswith("clang"):
+    if cmd[0].endswith("clang") or cmd[0].endswith("gcc"):
         """
         Example of compile step in clang:
 
