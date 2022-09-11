@@ -9,7 +9,8 @@ def zig_spawn(original_spawn, cmd):
     cmd_str = " ".join(cmd)
     log.warn("original spawned command: %s", cmd_str)
 
-    if cmd[0].endswith("clang") or cmd[0].endswith("gcc"):
+    gcc_or_clang = cmd[0] == "clang" or cmd[0] == "gcc"
+    if gcc_or_clang:
         """
         Example of compile step in clang:
 
@@ -33,20 +34,38 @@ def zig_spawn(original_spawn, cmd):
         -o build/lib.macosx-10.15-x86_64-3.10/zaml.cpython-310-darwin.so
         """
         compile_step = " -c " in cmd_str
-        link_step = not compile_step
-        original_spawn(
-            [
-                "zig",
-                "build-obj" if compile_step else "build-lib",
-                "-O",
-                "ReleaseSafe",
-                f"-femit-bin={re.search(r'-o (.+)$', cmd_str).group(1)}",
-                *(["-fallow-shlib-undefined"] if link_step else []),
-                *(["-dynamic"] if link_step else []),
-                *re.findall(r"(-[IL][^\s]+)", cmd_str),
-                re.search(r" (\S+) -o", cmd_str).group(1),
-            ]
-        )
+        if compile_step:
+            original_spawn(
+                [
+                    "zig",
+                    "build-obj",
+                    "-O",
+                    "ReleaseSafe",
+                    f"-femit-bin={re.search(r' -o (.+)$', cmd_str).group(1)}",
+                    *re.findall(
+                        r"(-[I][^\s]+)", cmd_str
+                    ),  # pass the -I/include/dirs to Zig
+                    re.search(r" -c (\S+) -o ", cmd_str).group(
+                        1
+                    ),  # the Zig source file(s) to compile
+                ]
+            )
+        else:
+            # link step
+            original_spawn(
+                [
+                    "zig",
+                    "build-obj",
+                    "-O",
+                    "ReleaseSafe",
+                    f"-femit-bin={re.search(r' -o (.+)$', cmd_str).group(1)}",
+                    "-fallow-shlib-undefined",
+                    "-dynamic",
+                    re.search(r" dynamic_lookup (.+) -o ", cmd_str).group(
+                        1
+                    ),  # pass the -L/lib/dirs and object files to Zig
+                ]
+            )
     else:
         raise Exception("Unrecognized C compiler, cannot translate to zig CLI flags")
 
