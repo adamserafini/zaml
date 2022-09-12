@@ -1,4 +1,5 @@
 import re
+import os
 from functools import partial
 
 from setuptools.command.build_ext import build_ext
@@ -173,6 +174,7 @@ class ZigCompiler(CCompiler):
         log.warn("self.objects is %s", self.objects)
         log.warn("lib_opts is %s", lib_opts)
         log.warn("self.linker_so is %s", str(self.linker_so))
+        self.mkpath(os.path.dirname(output_filename))
         self.spawn(
             [
                 "zig",
