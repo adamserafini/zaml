@@ -2,6 +2,7 @@ import re
 from functools import partial
 
 from setuptools.command.build_ext import build_ext
+from setuptools._distutils.ccompiler import CCompiler, gen_lib_options
 from setuptools._distutils import log
 
 
@@ -70,11 +71,132 @@ def zig_spawn(original_spawn, cmd):
         raise Exception("Unrecognized C compiler, cannot translate to zig CLI flags")
 
 
+class ZigCompiler(CCompiler):
+    def compile(
+        self,
+        sources,
+        output_dir=None,
+        macros=None,
+        include_dirs=None,
+        debug=0,
+        extra_preargs=None,
+        extra_postargs=None,
+        depends=None,
+    ):
+        log.warn(
+            "compile called with: sources: %s, output_dir: %s, macros: %s, include_dirs: %s, debug: %s, extra_preargs: %s, extra_postargs: %s, depends: %s",
+            sources,
+            output_dir,
+            macros,
+            include_dirs,
+            debug,
+            extra_preargs,
+            extra_postargs,
+            depends,
+        )
+        macros, objects, extra_postargs, pp_opts, build = self._setup_compile(
+            output_dir, macros, include_dirs, sources, depends, extra_postargs
+        )
+
+        log.warn(
+            "_setup_compile returned: macros: %s, objects: %s, extra_postargs: %s, pp_opts: %s, build: %s",
+            macros,
+            objects,
+            extra_postargs,
+            pp_opts,
+            build,
+        )
+        cc_args = self._get_cc_args(pp_opts, debug, extra_preargs)
+        log.warn("_get_cc_args returned %s", cc_args)
+        for obj in objects:
+            src, _ = build[obj]
+            self.spawn(
+                [
+                    "zig",
+                    "build-obj",
+                    "-O",
+                    "ReleaseSafe",
+                    f"-femit-bin={obj}",
+                    *pp_opts,
+                    src,
+                ]
+            )
+
+        return objects
+
+    def link_shared_object(
+        self,
+        objects,
+        output_filename,
+        output_dir=None,
+        libraries=None,
+        library_dirs=None,
+        runtime_library_dirs=None,
+        export_symbols=None,
+        debug=0,
+        extra_preargs=None,
+        extra_postargs=None,
+        build_temp=None,
+        target_lang=None,
+    ):
+        log.warn(
+            "link_shared_object called with objects: %s, output_filename: %s, output_dir: %s, libraries: %s, library_dirs: %s, runtime_lirary_dirs: %s, export_symbols: %s, debug: %s, extra_preargs: %s, extra_postargs: %s, build_temp: %s, target_lang: %s",
+            objects,
+            output_filename,
+            output_dir,
+            libraries,
+            library_dirs,
+            runtime_library_dirs,
+            export_symbols,
+            debug,
+            extra_preargs,
+            extra_postargs,
+            build_temp,
+            target_lang,
+        )
+        objects, output_dir = self._fix_object_args(objects, output_dir)
+        libraries, library_dirs, runtime_library_dirs = self._fix_lib_args(
+            libraries, library_dirs, runtime_library_dirs
+        )
+        lib_opts = gen_lib_options(self, library_dirs, runtime_library_dirs, libraries)
+
+        log.warn(
+            "_fix_object_args returned objects: %s, output_dir: %s", objects, output_dir
+        )
+        log.warn(
+            "_fix_lib_args returned libraries: %s, library_dirs: %s, runtime_library_dirs: %s",
+            libraries,
+            library_dirs,
+            runtime_library_dirs,
+        )
+        log.warn("_need_link returned %s", self._need_link(objects, output_filename))
+        log.warn("self.objects is %s", self.objects)
+        log.warn("lib_opts is %s", lib_opts)
+        log.warn("self.linker_so is %s", str(self.linker_so))
+        self.spawn(
+            [
+                "zig",
+                "build-lib",
+                "-O",
+                "ReleaseSafe",
+                f"-femit-bin={output_filename}",
+                "-fallow-shlib-undefined",
+                "-dynamic",
+                *[opt for opt in lib_opts if opt.startswith("-L/")],
+                *objects,
+                *self.objects,
+            ]
+        )
+
+
 class ZigBuilder(build_ext):
     def build_extension(self, ext):
         original_spawn = self.compiler.spawn
 
-        self.compiler.spawn = partial(zig_spawn, original_spawn)
+        # Yep, this is crazy ;-)
+        self.compiler.__class__.__bases__ = (
+            ZigCompiler,
+        ) + self.compiler.__class__.__bases__
         self.compiler.src_extensions.append(".zig")
         try:
             super().build_extension(ext)
