@@ -196,10 +196,11 @@ class ZigBuilder(build_ext):
         original_spawn = self.compiler.spawn
 
         # Yep, this is crazy ;-)
-        self.compiler.__class__.__bases__ = (
+        self.shlib_compiler.__class__.__bases__ = (
             ZigCompiler,
-        ) + self.compiler.__class__.__bases__
-        self.compiler.src_extensions.append(".zig")
+        ) + self.shlib_compiler.__class__.__bases__
+
+        self.shlib_compiler.src_extensions.append(".zig")
         try:
             super().build_extension(ext)
         finally:
