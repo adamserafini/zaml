@@ -201,6 +201,9 @@ class ZigBuilder(build_ext):
         self.compiler.src_extensions.append(".zig")
         super().build_extension(ext)
 
+    def run(self, *args, **kwargs):
+        pass
+
     def __getattribute__(self, name):
         import inspect
 
