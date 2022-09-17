@@ -83,6 +83,9 @@ class ZigCompiler:
         extra_postargs=None,
         depends=None,
     ):
+        if not self.initialized:
+            self.initialize()
+
         log.warn(
             "compile called with: sources: %s, output_dir: %s, macros: %s, include_dirs: %s, debug: %s, extra_preargs: %s, extra_postargs: %s, depends: %s",
             sources,
