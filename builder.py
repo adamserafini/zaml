@@ -202,7 +202,14 @@ class ZigBuilder(build_ext):
         self.compiler.__class__.__bases__ = (
             ZigCompiler,
         ) + self.compiler.__class__.__bases__
+        print("compiler type is", type(self.compiler))
         super().build_extensions()
+        print("compiler type is", type(self.compiler))
+
+    def swig_sources(self, *args, **kwargs):
+        print("compiler type is", type(self.compiler))
+        super().swig_sources(*args, **kwargs)
+        print("compiler type is", type(self.compiler))
 
     def __getattribute__(self, name):
         import inspect
