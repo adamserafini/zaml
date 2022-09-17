@@ -192,7 +192,7 @@ class ZigCompiler:
 
 class ZigBuilder(build_ext):
     def build_extension(self, ext):
-
+        log.warn("compiler type is %s", type(self.compiler))
         # Yep, this is crazy ;-)
         self.compiler.__class__.__bases__ = (
             ZigCompiler,
