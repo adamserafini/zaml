@@ -1,6 +1,5 @@
 import re
 import os
-from functools import partial
 
 from setuptools.command.build_ext import build_ext
 from setuptools._distutils.ccompiler import CCompiler, gen_lib_options
@@ -196,11 +195,11 @@ class ZigBuilder(build_ext):
         original_spawn = self.compiler.spawn
 
         # Yep, this is crazy ;-)
-        self.shlib_compiler.__class__.__bases__ = (
+        self.compiler.__class__.__bases__ = (
             ZigCompiler,
-        ) + self.shlib_compiler.__class__.__bases__
+        ) + self.compiler.__class__.__bases__
 
-        self.shlib_compiler.src_extensions.append(".zig")
+        self.compiler.src_extensions.append(".zig")
         try:
             super().build_extension(ext)
         finally:
