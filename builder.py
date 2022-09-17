@@ -200,3 +200,11 @@ class ZigBuilder(build_ext):
 
         self.compiler.src_extensions.append(".zig")
         super().build_extension(ext)
+
+    def __getattribute__(self, name):
+        import inspect
+
+        returned = object.__getattribute__(self, name)
+        if inspect.isfunction(returned) or inspect.ismethod(returned):
+            print("called ", returned.__name__)
+        return returned
