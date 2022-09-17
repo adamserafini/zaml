@@ -71,7 +71,7 @@ def zig_spawn(original_spawn, cmd):
         raise Exception("Unrecognized C compiler, cannot translate to zig CLI flags")
 
 
-class ZigCompiler(CCompiler):
+class ZigCompiler:
     def compile(
         self,
         sources,
@@ -192,7 +192,6 @@ class ZigCompiler(CCompiler):
 
 class ZigBuilder(build_ext):
     def build_extension(self, ext):
-        original_spawn = self.compiler.spawn
 
         # Yep, this is crazy ;-)
         self.compiler.__class__.__bases__ = (
@@ -200,7 +199,4 @@ class ZigBuilder(build_ext):
         ) + self.compiler.__class__.__bases__
 
         self.compiler.src_extensions.append(".zig")
-        try:
-            super().build_extension(ext)
-        finally:
-            self.compiler.zig_spawn = original_spawn
+        super().build_extension(ext)
