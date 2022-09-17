@@ -192,31 +192,28 @@ class ZigCompiler:
 
 class ZigBuilder(build_ext):
     def build_extension(self, ext):
-        # log.warn("compiler type is %s", type(self.compiler))
-        print("what")
-        print("compiler bases is", self.compiler.__class__.__bases__)
+        # print(type(ZigCompiler))
+        # print(type(self.compiler.__class__))
+        # original_class = self.compiler.__class__
+        def override(instance, method_name, target_class):
+            class_method = getattr(target_class, method_name)
+
+            def new_method(*args, **kwargs):
+                return class_method(instance, *args, **kwargs)
+
+            setattr(instance, method_name, new_method)
+
+        override(self.compiler, "compile", ZigCompiler)
+        override(self.compiler, "link_shared_object", ZigCompiler)
+        # self.compiler.compile = ZigCompiler.compile
+        # self.compiler.__class__.__bases__ = (original_class,) + self.compiler.__class__.__bases__
+        # self.compiler.__class__.mro() = (original_class,) + self.compiler.__class__.__mro__
         self.compiler.src_extensions.append(".zig")
         super().build_extension(ext)
 
-    def build_extensions(self):
-        # Yep, this is crazy ;-)
-        print("compiler bases is", self.compiler.__class__.__bases__)
-        self.compiler.__class__.__bases__ = (
-            ZigCompiler,
-        ) + self.compiler.__class__.__bases__
-        print("compiler bases is", self.compiler.__class__.__bases__)
-        super().build_extensions()
-        print("compiler bases is", self.compiler.__class__.__bases__)
-
-    def swig_sources(self, *args, **kwargs):
-        print("compiler bases is", self.compiler.__class__.__bases__)
-        super().swig_sources(*args, **kwargs)
-        print("compiler bases is", self.compiler.__class__.__bases__)
-
-    def __getattribute__(self, name):
-        import inspect
-
-        returned = object.__getattribute__(self, name)
-        if inspect.isfunction(returned) or inspect.ismethod(returned):
-            print("called ", returned.__name__)
-        return returned
+    # def __getattribute__(self, name):
+    #     returned = object.__getattribute__(self, name)
+    #     print("get attr returned ", returned.__name__)
+    #     if returned.__name__ == 'compiler':
+    #         print()
+    #     return returned
