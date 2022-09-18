@@ -121,8 +121,9 @@ class ZigCompiler:
                     "ReleaseSafe",
                     "--library",
                     "c",
+                    "-dynamic",
                     f"-femit-bin={obj}",
-                    *[arg for arg in cc_args if arg.startswith("-I")],
+                    *pp_opts,
                     src,
                 ]
             )
