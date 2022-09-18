@@ -123,6 +123,7 @@ class ZigCompiler:
                     "c",
                     "-dynamic",
                     "-fallow-shlib-undefined",
+                    "-fno-Clang",
                     f"-femit-bin={obj}",
                     *pp_opts,
                     src,
