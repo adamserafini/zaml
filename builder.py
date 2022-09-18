@@ -83,7 +83,7 @@ class ZigCompiler:
         extra_postargs=None,
         depends=None,
     ):
-        if hasattr(self, "initialize") and not not self.initialized:
+        if hasattr(self, "initialize") and not self.initialized:
             self.initialize()
 
         log.warn(
