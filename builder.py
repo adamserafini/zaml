@@ -121,6 +121,8 @@ class ZigCompiler:
                     "ReleaseSafe",
                     "--library",
                     "c",
+                    "--library",
+                    "c++",
                     "-dynamic",
                     "-fallow-shlib-undefined",
                     "-fno-Clang",
