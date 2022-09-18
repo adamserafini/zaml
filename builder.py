@@ -185,6 +185,8 @@ class ZigCompiler:
                 "build-lib",
                 "-O",
                 "ReleaseSafe",
+                "--library",
+                "c",
                 f"-femit-bin={output_filename}",
                 "-fallow-shlib-undefined",
                 "-dynamic",
