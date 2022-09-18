@@ -122,7 +122,7 @@ class ZigCompiler:
                     "--library",
                     "c",
                     f"-femit-bin={obj}",
-                    *pp_opts,
+                    *[arg for arg in cc_args if arg.startswith("-I")],
                     src,
                 ]
             )
