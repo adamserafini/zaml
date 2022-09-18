@@ -83,7 +83,7 @@ class ZigCompiler:
         extra_postargs=None,
         depends=None,
     ):
-        if not self.initialized:
+        if hasattr(self, "initialize") and not not self.initialized:
             self.initialize()
 
         log.warn(
@@ -119,6 +119,8 @@ class ZigCompiler:
                     "build-obj",
                     "-O",
                     "ReleaseSafe",
+                    "--library",
+                    "c",
                     f"-femit-bin={obj}",
                     *pp_opts,
                     src,
