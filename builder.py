@@ -62,7 +62,7 @@ class ZigCompiler:
         log.warn("_get_cc_args returned %s", cc_args)
         for obj in objects:
             src, _ = build[obj]
-            target = ["--target", "x86_64-windows-gnu"] if msvc else []
+            target = ["-target", "x86_64-windows-gnu"] if msvc else []
             self.spawn(
                 [
                     "zig",
