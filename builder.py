@@ -31,7 +31,8 @@ class ZigCompiler:
         Matches signature of distutils.CCompiler.compile
         """
         # This "initialize" step is exclusive to MSVC
-        if hasattr(self, "initialize") and not self.initialized:
+        msvc = hasattr(self, "initialize")
+        if msvc and not self.initialized:
             self.initialize()
 
         # Log level >= warn guarantees the output won't get swallowed
@@ -61,6 +62,7 @@ class ZigCompiler:
         log.warn("_get_cc_args returned %s", cc_args)
         for obj in objects:
             src, _ = build[obj]
+            target = ["--target", "x86_64-windows-gnu"] if msvc else []
             self.spawn(
                 [
                     "zig",
@@ -69,6 +71,7 @@ class ZigCompiler:
                     "ReleaseSafe",
                     "--library",
                     "c",
+                    *target,
                     f"-femit-bin={obj}",
                     *pp_opts,
                     src,
