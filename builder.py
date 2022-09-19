@@ -1,77 +1,21 @@
-import re
 import os
 
 from setuptools.command.build_ext import build_ext
-from setuptools._distutils.ccompiler import CCompiler, gen_lib_options
+from setuptools._distutils.ccompiler import gen_lib_options
 from setuptools._distutils import log
 
 
-def zig_spawn(original_spawn, cmd):
-    cmd_str = " ".join(cmd)
-    log.warn("original spawned command: %s", cmd_str)
-
-    gcc_or_clang = cmd[0] == "clang" or cmd[0] == "gcc"
-    if gcc_or_clang:
-        """
-        Example of compile step in clang:
-
-        clang -Wno-unused-result -Wsign-compare -Wunreachable-code -DNDEBUG -g -fwrapv -O3 -Wall
-        -I/Library/Developer/CommandLineTools/SDKs/MacOSX10.15.sdk/usr/include
-        -I/Library/Developer/CommandLineTools/SDKs/MacOSX10.15.sdk/usr/include
-        -I/Users/a.serafini/Projects/zaml/.venv/include
-        -I/Users/a.serafini/.pyenv/versions/3.10.2/include/python3.10
-        -c zamlmodule.zig
-        -o build/temp.macosx-10.15-x86_64-3.10/zamlmodule.o
-
-        Example of link step in clang:
-
-        clang -bundle -undefined dynamic_lookup
-        -L/usr/local/opt/readline/lib
-        -L/Users/a.serafini/.pyenv/versions/3.10.2/lib
-        -L/usr/local/opt/readline/lib
-        -L/usr/local/opt/readline/lib
-        -L/Users/a.serafini/.pyenv/versions/3.10.2/lib
-        build/temp.macosx-10.15-x86_64-3.10/zamlmodule.o
-        -o build/lib.macosx-10.15-x86_64-3.10/zaml.cpython-310-darwin.so
-        """
-        compile_step = " -c " in cmd_str
-        if compile_step:
-            original_spawn(
-                [
-                    "zig",
-                    "build-obj",
-                    "-O",
-                    "ReleaseSafe",
-                    f"-femit-bin={re.search(r' -o (.+)$', cmd_str).group(1)}",
-                    *re.findall(
-                        r"(-[I][^\s]+)", cmd_str
-                    ),  # pass the -I/include/dirs to Zig
-                    re.search(r" -c (\S+) -o ", cmd_str).group(
-                        1
-                    ),  # the Zig source file(s) to compile
-                ]
-            )
-        else:
-            # link step
-            original_spawn(
-                [
-                    "zig",
-                    "build-obj",
-                    "-O",
-                    "ReleaseSafe",
-                    f"-femit-bin={re.search(r' -o (.+)$', cmd_str).group(1)}",
-                    "-fallow-shlib-undefined",
-                    "-dynamic",
-                    re.search(r" dynamic_lookup (.+) -o ", cmd_str).group(
-                        1
-                    ),  # pass the -L/lib/dirs and object files to Zig
-                ]
-            )
-    else:
-        raise Exception("Unrecognized C compiler, cannot translate to zig CLI flags")
-
-
 class ZigCompiler:
+    """
+    distutils doesn't provide us anyway of 'hooking' alternative compiler classes into the extension compilation steps.
+    At the same time, we need info that only the initialised compiler class (subclass of CCompiler) has.
+
+    Solution: a "subclass" ZigCompiler that overrides two methods: CCompiler.compile and CCompiler.link_shared_object.
+    However instead of actually "subclassing" (which is not currently possible), we replace the methods at runtime,
+    after the original compiler instance has been initialised with the relevant info (see 'build_extension' for this
+    trick).
+    """
+
     def compile(
         self,
         sources,
@@ -83,9 +27,14 @@ class ZigCompiler:
         extra_postargs=None,
         depends=None,
     ):
+        """
+        Matches signature of distutils.CCompiler.compile
+        """
+        # This "initialize" step is exclusive to MSVC
         if hasattr(self, "initialize") and not self.initialized:
             self.initialize()
 
+        # Log level >= warn guarantees the output won't get swallowed
         log.warn(
             "compile called with: sources: %s, output_dir: %s, macros: %s, include_dirs: %s, debug: %s, extra_preargs: %s, extra_postargs: %s, depends: %s",
             sources,
@@ -100,7 +49,6 @@ class ZigCompiler:
         macros, objects, extra_postargs, pp_opts, build = self._setup_compile(
             output_dir, macros, include_dirs, sources, depends, extra_postargs
         )
-
         log.warn(
             "_setup_compile returned: macros: %s, objects: %s, extra_postargs: %s, pp_opts: %s, build: %s",
             macros,
@@ -121,11 +69,6 @@ class ZigCompiler:
                     "ReleaseSafe",
                     "--library",
                     "c",
-                    "--library",
-                    "c++",
-                    "-dynamic",
-                    "-fallow-shlib-undefined",
-                    "-fno-Clang",
                     f"-femit-bin={obj}",
                     *pp_opts,
                     src,
@@ -149,6 +92,9 @@ class ZigCompiler:
         build_temp=None,
         target_lang=None,
     ):
+        """
+        Matches signature of distutils.CCompiler.compile
+        """
         log.warn(
             "link_shared_object called with objects: %s, output_filename: %s, output_dir: %s, libraries: %s, library_dirs: %s, runtime_lirary_dirs: %s, export_symbols: %s, debug: %s, extra_preargs: %s, extra_postargs: %s, build_temp: %s, target_lang: %s",
             objects,
@@ -195,6 +141,7 @@ class ZigCompiler:
                 f"-femit-bin={output_filename}",
                 "-fallow-shlib-undefined",
                 "-dynamic",
+                # The library dirs
                 *[opt for opt in lib_opts if opt.startswith("-L/")],
                 *objects,
                 *self.objects,
@@ -204,10 +151,10 @@ class ZigCompiler:
 
 class ZigBuilder(build_ext):
     def build_extension(self, ext):
-        # print(type(ZigCompiler))
-        # print(type(self.compiler.__class__))
-        # original_class = self.compiler.__class__
-        def override(instance, method_name, target_class):
+        def override_instance_method(instance, method_name, target_class):
+            """
+            A trick to switch a method of an instance to an alternative implementation in another class at run time.
+            """
             class_method = getattr(target_class, method_name)
 
             def new_method(*args, **kwargs):
@@ -215,17 +162,7 @@ class ZigBuilder(build_ext):
 
             setattr(instance, method_name, new_method)
 
-        override(self.compiler, "compile", ZigCompiler)
-        override(self.compiler, "link_shared_object", ZigCompiler)
-        # self.compiler.compile = ZigCompiler.compile
-        # self.compiler.__class__.__bases__ = (original_class,) + self.compiler.__class__.__bases__
-        # self.compiler.__class__.mro() = (original_class,) + self.compiler.__class__.__mro__
+        override_instance_method(self.compiler, "compile", ZigCompiler)
+        override_instance_method(self.compiler, "link_shared_object", ZigCompiler)
         self.compiler.src_extensions.append(".zig")
         super().build_extension(ext)
-
-    # def __getattribute__(self, name):
-    #     returned = object.__getattribute__(self, name)
-    #     print("get attr returned ", returned.__name__)
-    #     if returned.__name__ == 'compiler':
-    #         print()
-    #     return returned
