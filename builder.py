@@ -58,6 +58,11 @@ class ZigCompiler:
             pp_opts,
             build,
         )
+        deduped_ppopts = []
+        for ppopt in pp_opts:
+            if ppopt.lower() not in [p.lower() for p in deduped_ppopts]:
+                deduped_ppopts.append(ppopt)
+
         cc_args = self._get_cc_args(pp_opts, debug, extra_preargs)
         log.warn("_get_cc_args returned %s", cc_args)
         for obj in objects:
@@ -71,7 +76,7 @@ class ZigCompiler:
                     "ReleaseSafe",
                     *target,
                     f"-femit-bin={obj}",
-                    *pp_opts,
+                    *deduped_ppopts,
                     src,
                 ]
             )
