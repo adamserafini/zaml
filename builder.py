@@ -69,8 +69,6 @@ class ZigCompiler:
                     "build-obj",
                     "-O",
                     "ReleaseSafe",
-                    "--library",
-                    "c",
                     *target,
                     f"-femit-bin={obj}",
                     *pp_opts,
