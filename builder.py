@@ -158,7 +158,11 @@ class ZigCompiler:
                 "-fallow-shlib-undefined",
                 "-dynamic",
                 # The library dirs
-                *[opt for opt in lib_opts if opt.startswith("-L/")],
+                *[
+                    opt
+                    for opt in lib_opts
+                    if opt.startswith("-L/") or opt.startswith("/LIBPATH:")
+                ],
                 *objects,
                 *self.objects,
             ]
