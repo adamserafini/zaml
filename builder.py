@@ -145,6 +145,8 @@ class ZigCompiler:
 
         target = ["-target", "x86_64-windows-msvc"] if msvc else []
 
+        lib_opts = [opt.replace("/LIBPATH:", "-L", 1) for opt in lib_opts]
+
         self.spawn(
             [
                 "zig",
@@ -158,11 +160,7 @@ class ZigCompiler:
                 "-fallow-shlib-undefined",
                 "-dynamic",
                 # The library dirs
-                *[
-                    opt
-                    for opt in lib_opts
-                    if opt.startswith("-L/") or opt.startswith("/LIBPATH:")
-                ],
+                *[opt for opt in lib_opts if opt.startswith("-L")],
                 *objects,
                 *self.objects,
             ]
