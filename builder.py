@@ -134,7 +134,8 @@ class ZigCompiler:
         log.warn("_need_link returned %s", self._need_link(objects, output_filename))
         log.warn("self.objects is %s", self.objects)
         log.warn("lib_opts is %s", lib_opts)
-        log.warn("self.linker_so is %s", str(self.linker_so))
+        if hasattr(self, "linker_so"):
+            log.warn("self.linker_so is %s", str(self.linker_so))
         self.mkpath(os.path.dirname(output_filename))
         self.spawn(
             [
