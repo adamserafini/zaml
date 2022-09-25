@@ -137,12 +137,21 @@ class ZigCompiler:
         if hasattr(self, "linker_so"):
             log.warn("self.linker_so is %s", str(self.linker_so))
         self.mkpath(os.path.dirname(output_filename))
+
+        # This "initialize" step is exclusive to MSVC
+        msvc = hasattr(self, "initialize")
+        # if msvc and not self.initialized:
+        #     self.initialize()
+
+        target = ["-target", "x86_64-windows-msvc"] if msvc else []
+
         self.spawn(
             [
                 "zig",
                 "build-lib",
                 "-O",
                 "ReleaseSafe",
+                *target,
                 "--library",
                 "c",
                 f"-femit-bin={output_filename}",
