@@ -160,6 +160,7 @@ class ZigCompiler:
                 "c",
                 f"-femit-bin={output_filename}",
                 "-fallow-shlib-undefined",
+                "-fdll-export-fns",
                 "-dynamic",
                 # The library dirs
                 *[opt for opt in lib_opts if opt.startswith("-L")],
