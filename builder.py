@@ -156,8 +156,6 @@ class ZigCompiler:
                 "-O",
                 "ReleaseSafe",
                 *target,
-                "--library",
-                "c",
                 f"-femit-bin={output_filename}",
                 "-fdll-export-fns",
                 # The library dirs
@@ -182,6 +180,6 @@ class ZigBuilder(build_ext):
             setattr(instance, method_name, new_method)
 
         override_instance_method(self.compiler, "compile", ZigCompiler)
-        override_instance_method(self.compiler, "link_shared_object", ZigCompiler)
+        # override_instance_method(self.compiler, "link_shared_object", ZigCompiler)
         self.compiler.src_extensions.append(".zig")
         super().build_extension(ext)
