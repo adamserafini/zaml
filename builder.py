@@ -77,7 +77,7 @@ class ZigCompiler:
                     *target,
                     "--library",
                     "c",
-                    "--static",
+                    "-static",
                     f"-femit-bin={obj}",
                     *pp_opts,
                     src,
