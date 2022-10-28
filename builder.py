@@ -80,6 +80,8 @@ class ZigCompiler:
                     "-dynamic",
                     "-fallow-shlib-undefined",
                     "-fno-dll-export-fns",
+                    "--entry",
+                    "PyInit_zaml",
                     f"-femit-bin={obj}",
                     *pp_opts,
                     src,
