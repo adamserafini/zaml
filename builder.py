@@ -78,6 +78,7 @@ class ZigCompiler:
                     "--library",
                     "c",
                     "-dynamic",
+                    "-fallow-shlib-undefined",
                     f"-femit-bin={obj}",
                     *pp_opts,
                     src,
