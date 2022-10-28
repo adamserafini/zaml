@@ -102,11 +102,9 @@ class ZigCompiler:
         build_temp=None,
         target_lang=None,
     ):
-        """
-        Matches signature of distutils.CCompiler.compile
-        """
-        log.warn(
-            "link_shared_object called with objects: %s, output_filename: %s, output_dir: %s, libraries: %s, library_dirs: %s, runtime_lirary_dirs: %s, export_symbols: %s, debug: %s, extra_preargs: %s, extra_postargs: %s, build_temp: %s, target_lang: %s",
+        extra_postargs.append("-ALTERNATENAME:_DllMainCRTStartup=DllMainCRTStartup")
+
+        self.original_link(
             objects,
             output_filename,
             output_dir,
@@ -120,52 +118,71 @@ class ZigCompiler:
             build_temp,
             target_lang,
         )
-        objects, output_dir = self._fix_object_args(objects, output_dir)
-        libraries, library_dirs, runtime_library_dirs = self._fix_lib_args(
-            libraries, library_dirs, runtime_library_dirs
-        )
-        lib_opts = gen_lib_options(self, library_dirs, runtime_library_dirs, libraries)
 
-        log.warn(
-            "_fix_object_args returned objects: %s, output_dir: %s", objects, output_dir
-        )
-        log.warn(
-            "_fix_lib_args returned libraries: %s, library_dirs: %s, runtime_library_dirs: %s",
-            libraries,
-            library_dirs,
-            runtime_library_dirs,
-        )
-        log.warn("_need_link returned %s", self._need_link(objects, output_filename))
-        log.warn("self.objects is %s", self.objects)
-        log.warn("lib_opts is %s", lib_opts)
-        if hasattr(self, "linker_so"):
-            log.warn("self.linker_so is %s", str(self.linker_so))
-        self.mkpath(os.path.dirname(output_filename))
-
-        # This "initialize" step is exclusive to MSVC
-        msvc = hasattr(self, "initialize")
-        # if msvc and not self.initialized:
-        #     self.initialize()
-
-        target = ["-target", "x86_64-windows-msvc"] if msvc else []
-
-        lib_opts = [opt.replace("/LIBPATH:", "-L", 1) for opt in lib_opts]
-
-        self.spawn(
-            [
-                "zig",
-                "build-lib",
-                "-O",
-                "ReleaseSafe",
-                *target,
-                f"-femit-bin={output_filename}",
-                "-fdll-export-fns",
-                # The library dirs
-                *[opt for opt in lib_opts if opt.startswith("-L")],
-                *objects,
-                *self.objects,
-            ]
-        )
+        # """
+        # Matches signature of distutils.CCompiler.compile
+        # """
+        # log.warn(
+        #     "link_shared_object called with objects: %s, output_filename: %s, output_dir: %s, libraries: %s, library_dirs: %s, runtime_lirary_dirs: %s, export_symbols: %s, debug: %s, extra_preargs: %s, extra_postargs: %s, build_temp: %s, target_lang: %s",
+        #     objects,
+        #     output_filename,
+        #     output_dir,
+        #     libraries,
+        #     library_dirs,
+        #     runtime_library_dirs,
+        #     export_symbols,
+        #     debug,
+        #     extra_preargs,
+        #     extra_postargs,
+        #     build_temp,
+        #     target_lang,
+        # )
+        # objects, output_dir = self._fix_object_args(objects, output_dir)
+        # libraries, library_dirs, runtime_library_dirs = self._fix_lib_args(
+        #     libraries, library_dirs, runtime_library_dirs
+        # )
+        # lib_opts = gen_lib_options(self, library_dirs, runtime_library_dirs, libraries)
+        #
+        # log.warn(
+        #     "_fix_object_args returned objects: %s, output_dir: %s", objects, output_dir
+        # )
+        # log.warn(
+        #     "_fix_lib_args returned libraries: %s, library_dirs: %s, runtime_library_dirs: %s",
+        #     libraries,
+        #     library_dirs,
+        #     runtime_library_dirs,
+        # )
+        # log.warn("_need_link returned %s", self._need_link(objects, output_filename))
+        # log.warn("self.objects is %s", self.objects)
+        # log.warn("lib_opts is %s", lib_opts)
+        # if hasattr(self, "linker_so"):
+        #     log.warn("self.linker_so is %s", str(self.linker_so))
+        # self.mkpath(os.path.dirname(output_filename))
+        #
+        # # This "initialize" step is exclusive to MSVC
+        # msvc = hasattr(self, "initialize")
+        # # if msvc and not self.initialized:
+        # #     self.initialize()
+        #
+        # target = ["-target", "x86_64-windows-msvc"] if msvc else []
+        #
+        # lib_opts = [opt.replace("/LIBPATH:", "-L", 1) for opt in lib_opts]
+        #
+        # self.spawn(
+        #     [
+        #         "zig",
+        #         "build-lib",
+        #         "-O",
+        #         "ReleaseSafe",
+        #         *target,
+        #         f"-femit-bin={output_filename}",
+        #         "-fdll-export-fns",
+        #         # The library dirs
+        #         *[opt for opt in lib_opts if opt.startswith("-L")],
+        #         *objects,
+        #         *self.objects,
+        #     ]
+        # )
 
 
 class ZigBuilder(build_ext):
@@ -182,6 +199,9 @@ class ZigBuilder(build_ext):
             setattr(instance, method_name, new_method)
 
         override_instance_method(self.compiler, "compile", ZigCompiler)
-        # override_instance_method(self.compiler, "link_shared_object", ZigCompiler)
+
+        original_link = self.compiler.link_shared_object
+        override_instance_method(self.compiler, "link_shared_object", ZigCompiler)
+        self.compiler.original_link = original_link
         self.compiler.src_extensions.append(".zig")
         super().build_extension(ext)
