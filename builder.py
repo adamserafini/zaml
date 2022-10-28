@@ -107,7 +107,7 @@ class ZigCompiler:
     ):
         if not extra_preargs:
             extra_preargs = []
-        extra_preargs.append("-ALTERNATENAME:_DllMainCRTStartup=DllMainCRTStartup")
+        extra_preargs.append("/ALTERNATENAME:_DllMainCRTStartup=DllMainCRTStartup")
 
         self.original_link(
             objects,
