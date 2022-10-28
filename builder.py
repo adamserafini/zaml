@@ -206,7 +206,7 @@ class ZigBuilder(build_ext):
         override_instance_method(self.compiler, "compile", ZigCompiler)
 
         original_link = self.compiler.link_shared_object
-        # override_instance_method(self.compiler, "link_shared_object", ZigCompiler)
+        override_instance_method(self.compiler, "link_shared_object", ZigCompiler)
         self.compiler.original_link = original_link
         self.compiler.src_extensions.append(".zig")
         super().build_extension(ext)
