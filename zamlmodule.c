@@ -4,7 +4,7 @@
 static PyObject *
 zaml_load(PyObject *self, PyObject *args)
 {
-    return Py_BuildValue("i", 2);
+    return Py_BuildValue("i", 3);
 }
 
 static PyMethodDef ZamlMethods[] = {
