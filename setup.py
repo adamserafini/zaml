@@ -1,7 +1,7 @@
 from setuptools import setup, Extension
 from builder import ZigBuilder
 
-zaml = Extension("zaml", sources=["zamlmodule.c"])
+zaml = Extension("zaml", sources=["zamlmodule.zig"])
 
 setup(
     name="zaml",
