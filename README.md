@@ -97,7 +97,7 @@ docker start -ia zaml
 
 #### Windows
 
-To test in Windows, the easiest way I have found is using [VirtualBox](https://www.virtualbox.org/wiki/Downloads).
+To test in Windows from a Mac, the easiest way I have found is to use [Parallels](https://www.parallels.com/).
 
 #### MacOSX
 

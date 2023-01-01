@@ -3,6 +3,7 @@ import platform
 from setuptools.command.build_ext import build_ext
 import sysconfig
 
+
 class ZigBuilder(build_ext):
     def build_extension(self, ext):
         assert len(ext.sources) == 1
@@ -23,7 +24,14 @@ class ZigBuilder(build_ext):
                 "-fallow-shlib-undefined",
                 "-dynamic",
                 *[f"-I{d}" for d in self.include_dirs],
-                *([f"-L{sysconfig.get_config_var('installed_base')}\Libs", "-lpython3"] if windows else []),
+                *(
+                    [
+                        f"-L{sysconfig.get_config_var('installed_base')}\Libs",
+                        "-lpython3",
+                    ]
+                    if windows
+                    else []
+                ),
                 ext.sources[0],
             ]
         )
