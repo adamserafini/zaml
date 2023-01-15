@@ -7,3 +7,4 @@ dist/
 zig-cache/
 __pycache__
 .eggs
+wheelhouse
