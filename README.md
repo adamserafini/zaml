@@ -1,19 +1,30 @@
 # 🚀 zaml
-Fast YAML 1.2 parsing library for Python 3.10.x. 🐍
+Fast YAML 1.2 parsing library for Python 3.6+ 🐍
 
 ## What's This?
 
 Proof-of-concept for my PyCon DE 2022 [talk](https://2022.pycon.de/program/DFWSQR/), 
+[video](https://www.youtube.com/watch?v=O0MmmZxdct4), 
 **Speeding Up Python with Zig**, not yet recommended for production use!
 
 Library with the following objectives:
  - [x] Written in pure Zig, importing `Python.h` headers directly, no FFI, `ctypes` or `cffi`.
  - [x] Compiled using the Zig toolchain / CLI, no other tool (eg. `clang`) required.
  - [x] Tested to be compatible with mac OSX, Linux and Windows.
- - [ ] Installable via PyPI, end-user should not require Zig toolchain locally in order to use.
+ - [x] Installable via PyPI
+ - [ ] Should not require Zig toolchain locally in order to install and use.
  - [ ] Fastest available YAML 1.2 parser for Python.
 
 Help wanted to achieve the full objectives, PRs welcome.
+
+### Installation
+
+```
+pip install zaml
+```
+
+**Note**: currently source distribution only, ie. `sdist` - no binary `wheels` (yet), therefore requires Zig 0.10.0 
+installed locally. Any other Zig version is untested.
 
 ### Installing Locally
 
@@ -103,3 +114,22 @@ To test in Windows from a Mac, the easiest way I have found is to use [Parallels
 
 I am writing this `README` on a Mac. Consequently, I have not attempted testing this library in MacOSX from another
 operating system host. If you manage this, please do add documentation about it here.
+
+### Publishing to PyPI
+ 
+**Note**: Temporary instructions (until full CI setup).
+
+You may need to upgrade `build` and `twine` (with your `virtualenv` activated):
+
+```
+python -m pip install --upgrade build
+python -m pip install --upgrade twine
+```
+
+Then:
+
+```
+rm -rf dist
+python3 -m build --sdist
+python3 -m twine upload --repository pypi dist/*
+```

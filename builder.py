@@ -10,14 +10,13 @@ class ZigBuilder(build_ext):
 
         if not os.path.exists(self.build_lib):
             os.makedirs(self.build_lib)
-        mode = "Debug" if self.debug else "ReleaseFast"
         windows = platform.system() == "Windows"
         self.spawn(
             [
                 "zig",
                 "build-lib",
                 "-O",
-                mode,
+                "ReleaseFast",
                 "-lc",
                 *(["-target", "x86_64-windows-msvc"] if windows else []),
                 f"-femit-bin={self.get_ext_fullpath(ext.name)}",
