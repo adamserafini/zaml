@@ -8,3 +8,4 @@ zig-cache/
 __pycache__
 .eggs
 wheelhouse
+.DS_Store
