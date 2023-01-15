@@ -46,6 +46,6 @@ setup(
     description="Fast YAML 1.2 Parser for Python 3.6+",
     ext_modules=[zaml],
     cmdclass={"build_ext": ZigBuilder},
-    long_description=(Path(__file__).parent / "README.md").read_text(),
+    long_description=(Path(__file__).parent / "README.md").read_text(encoding="utf-8"),
     long_description_content_type="text/markdown",
 )
