@@ -1,5 +1,6 @@
 [tool.cibuildwheel.linux]
-build = "*x86_64"
+# Only build CPython (no PyPy) on x86_64 architecture
+build = "cp*x86_64"
 before-all = [
     # Install Zig on CentOS
     "cd /tmp",
@@ -8,3 +9,4 @@ before-all = [
     "mv zig-linux-x86_64-0.9.1 /usr/local/bin/zig-linux-0.9.1"
 ]
 environment = { PATH="$PATH:/usr/local/bin/zig-linux-0.9.1" }
+test-command = "python {project}/test.py"
