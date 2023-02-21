@@ -1,3 +1,6 @@
+[tool.cibuildwheel]
+test-command = "python {project}/test.py"
+
 [tool.cibuildwheel.linux]
 # Only build CPython (no PyPy) on x86_64 architecture
 build = "cp*x86_64"
@@ -9,4 +12,8 @@ before-all = [
     "mv zig-linux-x86_64-0.9.1 /usr/local/bin/zig-linux-0.9.1"
 ]
 environment = { PATH="$PATH:/usr/local/bin/zig-linux-0.9.1" }
-test-command = "python {project}/test.py"
+
+[tool.cibuildwheel.macos]
+before-all = [
+    "brew install zig@0.9.1"
+]
