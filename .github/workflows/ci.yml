@@ -1,7 +1,16 @@
 name: CI
-on: pull_request
+
+on:
+  pull_request:
+  release:
+    types:
+      - published
 
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    name: Lint Python files # TODO: also lint Zig
+    uses: pre-commit/action@v2.0.3
   test-windows:
     runs-on: windows-latest
     steps:
@@ -30,7 +39,7 @@ jobs:
           version: 0.9.1
       - name: Run simple module test
         run: python test.py
-  test-linux:
+  benchmark:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -42,14 +51,10 @@ jobs:
         uses: goto-bus-stop/setup-zig@v1
         with:
           version: 0.9.1
-      - name: Lint Python files # TODO: get Zig linting working
-        uses: pre-commit/action@v2.0.3
-      - name: Run simple module test
-        run: python test.py
       - name: Run benchmark
         working-directory: ./benchmark
         run: python benchmark.py
-  build_wheels:
+  build_and_test_wheels:
     name: Build wheels on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
@@ -59,5 +64,36 @@ jobs:
         os: [ ubuntu-20.04 ]
     steps:
       - uses: actions/checkout@v3
-      - name: Build wheels
+      - name: Build and test wheels
         uses: pypa/cibuildwheel@v2.12.0
+      - uses: actions/upload-artifact@v3
+        with:
+          path: ./wheelhouse/*.whl
+
+  build_sdist:
+    needs: [ test-mac-osx, test-windows ]
+    name: Make Python source distribution
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build SDist
+        run: pipx run build --sdist
+
+      - uses: actions/upload-artifact@v3
+        with:
+          path: dist/*.tar.gz
+
+  upload_pypi:
+    needs: [ build_and_test_wheels, build_sdist ]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'release' && github.event.action == 'published'
+    steps:
+      - uses: actions/download-artifact@v3
+        with:
+          name: artifact
+          path: dist
+
+      - uses: pypa/gh-action-pypi-publish@v1.5.0
+        with:
+          user: __token__
+          password: ${{ secrets.pypi_password }}
