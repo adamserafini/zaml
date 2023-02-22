@@ -9,3 +9,5 @@ __pycache__
 .eggs
 wheelhouse
 .DS_Store
+.envrc
+.python-version
