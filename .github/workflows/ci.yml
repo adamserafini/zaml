@@ -72,30 +72,30 @@ jobs:
         with:
           path: ./wheelhouse/*.whl
 
-  build_sdist:
-    needs: [ test-mac-osx, test-windows ]
-    name: Make Python source distribution
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Build SDist
-        run: pipx run build --sdist
-
-      - uses: actions/upload-artifact@v3
-        with:
-          path: dist/*.tar.gz
-
-  upload_pypi:
-    needs: [ build_and_test_wheels, build_sdist ]
-    runs-on: ubuntu-latest
-    if: github.event_name == 'release' && github.event.action == 'published'
-    steps:
-      - uses: actions/download-artifact@v3
-        with:
-          name: artifact
-          path: dist
-
-      - uses: pypa/gh-action-pypi-publish@v1.5.0
-        with:
-          user: __token__
-          password: ${{ secrets.pypi_password }}
+#  build_sdist:
+#    needs: [ test-mac-osx, test-windows ]
+#    name: Make Python source distribution
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/checkout@v3
+#      - name: Build SDist
+#        run: pipx run build --sdist
+#
+#      - uses: actions/upload-artifact@v3
+#        with:
+#          path: dist/*.tar.gz
+#
+#  upload_pypi:
+#    needs: [ build_and_test_wheels, build_sdist ]
+#    runs-on: ubuntu-latest
+#    if: github.event_name == 'release' && github.event.action == 'published'
+#    steps:
+#      - uses: actions/download-artifact@v3
+#        with:
+#          name: artifact
+#          path: dist
+#
+#      - uses: pypa/gh-action-pypi-publish@v1.5.0
+#        with:
+#          user: __token__
+#          password: ${{ secrets.pypi_password }}
