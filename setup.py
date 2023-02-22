@@ -7,7 +7,7 @@ zaml = Extension("zaml", sources=["zamlmodule.zig"])
 
 setup(
     name="zaml",
-    version="0.0.8",
+    version="0.0.9",
     url="https://github.com/adamserafini/zaml",
     description="Fast YAML 1.2 Parser for Python 3.6+",
     ext_modules=[zaml],
