@@ -29,7 +29,7 @@ before-all = [
 environment = { PATH="$PATH:/usr/local/bin/zig-macos-0.9.1" }
 before-test = "python -sSc 'import platform; print(platform.machine())'"
 
-[tool.cibuildwheel.macos]
+[tool.cibuildwheel.windows]
 before-all = [
     "choco install zig --version 0.9.1",
 ]
