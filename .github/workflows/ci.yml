@@ -49,3 +49,15 @@ jobs:
       - name: Run benchmark
         working-directory: ./benchmark
         run: python benchmark.py
+  build_wheels:
+    name: Build wheels on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        # TODO: build wheels on other platforms
+        # os: [ubuntu-20.04, windows-2019, macos-11]
+        os: [ ubuntu-20.04 ]
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build wheels
+        uses: pypa/cibuildwheel@v2.12.0
