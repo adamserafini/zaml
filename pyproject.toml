@@ -24,3 +24,4 @@ before-all = [
     "mv zig-macos-x86_64-0.9.1 /usr/local/bin/zig-macos-0.9.1"
 ]
 environment = { PATH="$PATH:/usr/local/bin/zig-macos-0.9.1" }
+before-test = "python -sSc 'import platform; print(platform.machine())'"
