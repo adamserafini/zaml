@@ -1,5 +1,7 @@
 const py = @cImport({
-    @cDefine("Py_LIMITED_API", "3");
+    // Supporting Python >=3.6.0 and above, see:
+    // https://docs.python.org/3/c-api/stable.html#c.Py_LIMITED_API
+    @cDefine("Py_LIMITED_API", "0x03060000");
     @cDefine("PY_SSIZE_T_CLEAN", {});
     @cInclude("Python.h");
 });

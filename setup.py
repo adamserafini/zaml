@@ -3,7 +3,7 @@ from pathlib import Path
 
 from builder import ZigBuilder
 
-zaml = Extension("zaml", sources=["zamlmodule.zig"])
+zaml = Extension("zaml", sources=["zamlmodule.zig"], py_limited_api=True)
 
 setup(
     name="zaml",
