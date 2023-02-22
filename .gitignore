@@ -10,3 +10,4 @@ __pycache__
 wheelhouse
 .DS_Store
 .envrc
+.python-version
