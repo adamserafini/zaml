@@ -4,6 +4,7 @@ build/
 dist/
 *.egg-info
 *.so
+*.pyd
 zig-cache/
 __pycache__
 .eggs
