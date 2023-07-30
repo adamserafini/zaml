@@ -48,15 +48,17 @@ fn benchmark_load(self: [*c]PyObject, args: [*c]PyObject) callconv(.C) [*]PyObje
 
     for (keys) |key| {
         const value = map.get(key) orelse unreachable;
-        var pyKey = Py_BuildValue("s#", @ptrCast([*]const u8, key), key.len);
-        var valueStr = value.asString() catch unreachable;
-        const pyValue = Py_BuildValue("s#", @ptrCast([*]const u8, valueStr), valueStr.len);
+        var value_str = value.asString() catch unreachable;
 
         // TODO: again, we just ignore the potential errors that could happen here.
         // Don't do that in real life!
-        _ = PyDict_SetItem(dict, pyKey, pyValue);
-    }
+        const py_key_ptr: [*]const u8 = @ptrCast(key);
+        const py_value_ptr: [*]const u8 = @ptrCast(value_str);
 
+        const py_key = Py_BuildValue("s#", py_key_ptr, key.len);
+        const py_value = Py_BuildValue("s#", py_value_ptr, value_str.len);
+        _ = PyDict_SetItem(dict, py_key, py_value);
+    }
 
     return Py_BuildValue("O", dict);
 }
@@ -99,4 +101,3 @@ var benchmarkmodule = PyModuleDef{
 pub export fn PyInit_benchmark() [*]PyObject {
     return PyModule_Create(&benchmarkmodule);
 }
-
