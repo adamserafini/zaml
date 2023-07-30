@@ -29,21 +29,30 @@ fn benchmark_load(self: [*c]PyObject, args: [*c]PyObject) callconv(.C) [*c]PyObj
     var string: [*:0]const u8 = undefined;
     if (PyArg_ParseTuple(args, "s", &string) == 0) return null;
 
-    // "catch unreachable" tells Zig compiler this can't possibly fail
-    // Of course, it might fail: this is just a benchmark.
-    // Did I mention not to use this in production?
     var arena = std.heap.ArenaAllocator.init(general_purpose_allocator.allocator());
     defer arena.deinit();
     const allocator = arena.allocator();
 
+    // TODO: remove 'catch unreachable' by catching the YamlError
+    // https://github.com/kubkon/zig-yaml/blob/3d3c7ae400243a37c6b422b6cba7173656984897/src/yaml.zig#L17-L22
+    // define and set an appropriate error
+    // https://docs.python.org/3.9/extending/extending.html#intermezzo-errors-and-exceptions
+    // and return null as above
     var untyped = yaml.Yaml.load(allocator, std.mem.sliceTo(string, 0)) catch unreachable;
 
+    // TODO: same as TODO on ln 50 but maybe assert on `docs` size
     // Our friend "catch unreachable" again :)
     var map = untyped.docs.items[0].asMap() catch unreachable;
 
     var dict = PyDict_New();
 
     for (map.keys(), map.values()) |key, value| {
+        // TODO: `value` type can be any of https://github.com/kubkon/zig-yaml/blob/3d3c7ae400243a37c6b422b6cba7173656984897/src/yaml.zig#L28-L33
+        // Suggestion to handle the type appropriately
+        // 1. Pattern match on value type
+        // 2. Build the corresponsing PyObject https://docs.python.org/3.9/extending/extending.html#building-arbitrary-values
+        // 3. Return its pointer
+
         var value_str = value.asString() catch unreachable;
 
         // TODO: again, we just ignore the potential errors that could happen here.
