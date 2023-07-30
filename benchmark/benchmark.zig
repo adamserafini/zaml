@@ -23,7 +23,7 @@ const METH_VARARGS = py.METH_VARARGS;
 var general_purpose_allocator = std.heap.GeneralPurposeAllocator(.{}){};
 
 // Don't think about using this in production, it probably has bugs + memory leaks
-fn benchmark_load(self: [*c]PyObject, args: [*c]PyObject) callconv(.C) [*]PyObject {
+fn benchmark_load(self: [*c]PyObject, args: [*c]PyObject) callconv(.C) [*c]PyObject {
     _ = self;
 
     var string: [*:0]const u8 = undefined;
