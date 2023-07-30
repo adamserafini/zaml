@@ -7,8 +7,7 @@ const std = @import("std");
 
 // Zig library for parsing yaml
 // https://github.com/kubkon/zig-yaml
-// TODO: include this as a Git submodule or as a package (when Zig gets official package manager)
-const yaml = @import("libs/zig-yaml/src/main.zig");
+const yaml = @import("libs/zig-yaml/src/yaml.zig");
 
 const PyArg_ParseTuple = py.PyArg_ParseTuple;
 const PyObject = py.PyObject;
