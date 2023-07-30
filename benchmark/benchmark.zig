@@ -7,8 +7,7 @@ const std = @import("std");
 
 // Zig library for parsing yaml
 // https://github.com/kubkon/zig-yaml
-// TODO: include this as a Git submodule or as a package (when Zig gets official package manager)
-const yaml = @import("libs/zig-yaml/src/main.zig");
+const yaml = @import("libs/zig-yaml/src/yaml.zig");
 
 const PyArg_ParseTuple = py.PyArg_ParseTuple;
 const PyObject = py.PyObject;
@@ -21,42 +20,50 @@ const PyDict_SetItem = py.PyDict_SetItem;
 const Py_BuildValue = py.Py_BuildValue;
 const METH_VARARGS = py.METH_VARARGS;
 
-// Would not use "testing" allocator for production
-const test_allocator = std.testing.allocator;
+var general_purpose_allocator = std.heap.GeneralPurposeAllocator(.{}){};
 
 // Don't think about using this in production, it probably has bugs + memory leaks
-fn benchmark_load(self: [*c]PyObject, args: [*c]PyObject) callconv(.C) [*]PyObject {
+fn benchmark_load(self: [*c]PyObject, args: [*c]PyObject) callconv(.C) [*c]PyObject {
     _ = self;
 
     var string: [*:0]const u8 = undefined;
-    // TODO: handle errors / unexpected input. Probably not a good idea to silently ignore them.
-    _ = PyArg_ParseTuple(args, "s", &string);
+    if (PyArg_ParseTuple(args, "s", &string) == 0) return null;
 
-    // "catch unreachable" tells Zig compiler this can't possibly fail
-    // Of course, it might fail: this is just a benchmark.
-    // Did I mention not to use this in production?
-    var untyped = yaml.Yaml.load(std.testing.allocator, std.mem.sliceTo(string, 0)) catch unreachable;
-    // Free all memory at the end of the current scope
-    defer untyped.deinit();
+    var arena = std.heap.ArenaAllocator.init(general_purpose_allocator.allocator());
+    defer arena.deinit();
+    const allocator = arena.allocator();
 
+    // TODO: remove 'catch unreachable' by catching the YamlError
+    // https://github.com/kubkon/zig-yaml/blob/3d3c7ae400243a37c6b422b6cba7173656984897/src/yaml.zig#L17-L22
+    // define and set an appropriate error
+    // https://docs.python.org/3.9/extending/extending.html#intermezzo-errors-and-exceptions
+    // and return null as above
+    var untyped = yaml.Yaml.load(allocator, std.mem.sliceTo(string, 0)) catch unreachable;
+
+    // TODO: same as TODO on ln 50 but maybe assert on `docs` size
     // Our friend "catch unreachable" again :)
     var map = untyped.docs.items[0].asMap() catch unreachable;
 
     var dict = PyDict_New();
 
-    const keys = map.keys();
+    for (map.keys(), map.values()) |key, value| {
+        // TODO: `value` type can be any of https://github.com/kubkon/zig-yaml/blob/3d3c7ae400243a37c6b422b6cba7173656984897/src/yaml.zig#L28-L33
+        // Suggestion to handle the type appropriately
+        // 1. Pattern match on value type
+        // 2. Build the corresponsing PyObject https://docs.python.org/3.9/extending/extending.html#building-arbitrary-values
+        // 3. Return its pointer
 
-    for (keys) |key| {
-        const value = map.get(key) orelse unreachable;
-        var pyKey = Py_BuildValue("s#", @ptrCast([*]const u8, key), key.len);
-        var valueStr = value.asString() catch unreachable;
-        const pyValue = Py_BuildValue("s#", @ptrCast([*]const u8, valueStr), valueStr.len);
+        var value_str = value.asString() catch unreachable;
 
         // TODO: again, we just ignore the potential errors that could happen here.
         // Don't do that in real life!
-        _ = PyDict_SetItem(dict, pyKey, pyValue);
-    }
+        const py_key_ptr: [*]const u8 = @ptrCast(key);
+        const py_value_ptr: [*]const u8 = @ptrCast(value_str);
 
+        const py_key = Py_BuildValue("s#", py_key_ptr, key.len);
+        const py_value = Py_BuildValue("s#", py_value_ptr, value_str.len);
+        _ = PyDict_SetItem(dict, py_key, py_value);
+    }
 
     return Py_BuildValue("O", dict);
 }
@@ -99,4 +106,3 @@ var benchmarkmodule = PyModuleDef{
 pub export fn PyInit_benchmark() [*]PyObject {
     return PyModule_Create(&benchmarkmodule);
 }
-

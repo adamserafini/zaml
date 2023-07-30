@@ -1,0 +1,3 @@
+[submodule "benchmark/libs/zig-yaml"]
+	path = benchmark/libs/zig-yaml
+	url = https://github.com/kubkon/zig-yaml
