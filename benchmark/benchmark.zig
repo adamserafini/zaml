@@ -44,10 +44,7 @@ fn benchmark_load(self: [*c]PyObject, args: [*c]PyObject) callconv(.C) [*]PyObje
 
     var dict = PyDict_New();
 
-    const keys = map.keys();
-
-    for (keys) |key| {
-        const value = map.get(key) orelse unreachable;
+    for (map.keys(), map.values()) |key, value| {
         var value_str = value.asString() catch unreachable;
 
         // TODO: again, we just ignore the potential errors that could happen here.
