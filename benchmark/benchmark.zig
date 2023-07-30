@@ -20,8 +20,7 @@ const PyDict_SetItem = py.PyDict_SetItem;
 const Py_BuildValue = py.Py_BuildValue;
 const METH_VARARGS = py.METH_VARARGS;
 
-// Would not use "testing" allocator for production
-const test_allocator = std.testing.allocator;
+var general_purpose_allocator = std.heap.GeneralPurposeAllocator(.{}){};
 
 // Don't think about using this in production, it probably has bugs + memory leaks
 fn benchmark_load(self: [*c]PyObject, args: [*c]PyObject) callconv(.C) [*]PyObject {
@@ -34,9 +33,11 @@ fn benchmark_load(self: [*c]PyObject, args: [*c]PyObject) callconv(.C) [*]PyObje
     // "catch unreachable" tells Zig compiler this can't possibly fail
     // Of course, it might fail: this is just a benchmark.
     // Did I mention not to use this in production?
-    var untyped = yaml.Yaml.load(std.testing.allocator, std.mem.sliceTo(string, 0)) catch unreachable;
-    // Free all memory at the end of the current scope
-    defer untyped.deinit();
+    var arena = std.heap.ArenaAllocator.init(general_purpose_allocator.allocator());
+    defer arena.deinit();
+    const allocator = arena.allocator();
+
+    var untyped = yaml.Yaml.load(allocator, std.mem.sliceTo(string, 0)) catch unreachable;
 
     // Our friend "catch unreachable" again :)
     var map = untyped.docs.items[0].asMap() catch unreachable;
