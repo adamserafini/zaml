@@ -27,8 +27,7 @@ fn benchmark_load(self: [*c]PyObject, args: [*c]PyObject) callconv(.C) [*c]PyObj
     _ = self;
 
     var string: [*:0]const u8 = undefined;
-    // TODO: handle errors / unexpected input. Probably not a good idea to silently ignore them.
-    _ = PyArg_ParseTuple(args, "s", &string);
+    if (PyArg_ParseTuple(args, "s", &string) == 0) return null;
 
     // "catch unreachable" tells Zig compiler this can't possibly fail
     // Of course, it might fail: this is just a benchmark.
