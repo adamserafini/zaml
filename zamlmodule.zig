@@ -15,7 +15,7 @@ const METH_NOARGS = py.METH_NOARGS;
 fn zaml_load(self: [*c]PyObject, args: [*c]PyObject) callconv(.C) [*]PyObject {
     _ = self;
     _ = args;
-    return Py_BuildValue("i", @as(c_int, 1));
+    return PyLong_FromLong(@as(c_long, 1));
 }
 
 var ZamlMethods = [_]PyMethodDef{
